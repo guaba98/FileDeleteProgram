@@ -58,12 +58,19 @@ CFileDeleteProgramDlg::CFileDeleteProgramDlg(CWnd* pParent /*=NULL*/)
 void CFileDeleteProgramDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_DEL_PATH, m_ctrlDelPathList);
+	DDX_Control(pDX, IDC_EDIT_PATH, m_EditAddPath);
 }
 
 BEGIN_MESSAGE_MAP(CFileDeleteProgramDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BTN_SET_PATH, &CFileDeleteProgramDlg::OnBnClickedBtnSetPath)
+	ON_BN_CLICKED(IDC_BTN_ADD_PATH, &CFileDeleteProgramDlg::OnBnClickedBtnAddPath)
+	ON_BN_CLICKED(IDC_BTN_SET_COPY_PATH, &CFileDeleteProgramDlg::OnBnClickedBtnSetCopyPath)
+	ON_BN_CLICKED(IDC_BTN_SAVE_CLOSE, &CFileDeleteProgramDlg::OnBnClickedBtnSaveClose)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_DEL_PATH, &CFileDeleteProgramDlg::OnNMDblclkListDelPath)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +159,75 @@ HCURSOR CFileDeleteProgramDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+// 삭제할 폴더 경로 탐색
+void CFileDeleteProgramDlg::OnBnClickedBtnSetPath()
+{
+	// 초기 선택 폴더
+	CString strInitPath = _T("C:\\");
+	CString strLog;
+	// 폴더 선택 다이얼로그
+	CFolderPickerDialog Picker(strInitPath, OFN_FILEMUSTEXIST, NULL, 0);
+	if (Picker.DoModal() == IDOK)
+	{
+		// 선택된 폴더 경로얻음
+		m_strFolderPath = Picker.GetPathName();
+
+		GetDlgItem(IDC_EDIT_PATH)->SetWindowText(m_strFolderPath);
+	}
+}
+
+// 삭제할 폴더 경로 추가
+void CFileDeleteProgramDlg::OnBnClickedBtnAddPath()
+{
+	// 경로 가져오기
+	CString strAddPath;
+	m_EditAddPath.GetWindowTextW(strAddPath);
+
+	// 비어있지 않은 경우만 추가
+	if (!strAddPath.IsEmpty())
+	{
+		// 리스트 컨트롤에 값 추가
+		int nIndex = m_ctrlDelPathList.InsertItem(m_ctrlDelPathList.GetItemCount(), strAddPath);
+
+		// Cstring 배열에 값 추가
+		arr.push_back(strAddPath);
+
+		// text edit control에 값 삭제
+		m_EditAddPath.SetWindowTextW(_T(""));
+
+	}
+
+	UpdateData(FALSE);
+	
+	
+}
+
+// 복사할 경로 설정
+void CFileDeleteProgramDlg::OnBnClickedBtnSetCopyPath()
+{
+	
+}
+
+
+// 저장하고 닫기 
+void CFileDeleteProgramDlg::OnBnClickedBtnSaveClose()
+{
+	
+}
+
+// 더블클릭시 리스트컨트롤에서 해당 아이템 삭제
+void CFileDeleteProgramDlg::OnNMDblclkListDelPath(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	// 우클릭한 아이템 삭제
+	int nItem = m_ctrlDelPathList.GetNextItem(-1, LVNI_SELECTED);
+	if (nItem != -1)
+	{
+		m_ctrlDelPathList.DeleteItem(nItem);
+
+		// CString 배열에서 값 삭제
+		arr.erase(arr.begin() + nItem);
+	}
+	*pResult = 0;
+}

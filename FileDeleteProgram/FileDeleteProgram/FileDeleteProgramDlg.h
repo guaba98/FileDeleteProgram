@@ -3,6 +3,9 @@
 //
 
 #pragma once
+#include "afxcmn.h"
+#include "afxwin.h"
+#include <vector>
 
 
 // CFileDeleteProgramDlg 대화 상자
@@ -31,4 +34,15 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedBtnSetPath();
+	afx_msg void OnBnClickedBtnAddPath();
+	afx_msg void OnBnClickedBtnSetCopyPath();
+	afx_msg void OnBnClickedBtnSaveClose();
+
+	CString m_strFolderPath;
+	CListCtrl m_ctrlDelPathList;
+	CEdit m_EditAddPath;
+	std::vector<CString> arr; // 값을 저장할 CString 배열
+	afx_msg void OnNMDblclkListDelPath(NMHDR *pNMHDR, LRESULT *pResult);
 };
